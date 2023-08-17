@@ -17,6 +17,9 @@ namespace epi.videoProcessor.crestron.wp401
         [JsonProperty("screen")]
         public ScreenInfo Screen { get; set; }
 
+        [JsonProperty("disableAutoMode")]
+        public bool DisableAutoMode { get; set; }
+
     }
 
     public class ScreenInfo

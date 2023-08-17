@@ -10,6 +10,7 @@ namespace epi.videoProcessor.crestron.wp401
     public class Wp401Controller : CrestronGenericBridgeableBaseDevice
     {
         private readonly HdWp4k401C _401C;
+        public bool DisableAutoMode { get; private set; }
 
         public IntFeedback LayoutFeedback { get; private set; }
         //public IntFeedback ImageFeedback { get; private set; }
@@ -38,7 +39,7 @@ namespace epi.videoProcessor.crestron.wp401
             : base(key, name, device)
         {
             _401C = device;
-
+            DisableAutoMode = props.DisableAutoMode;
             LayoutNamesFeedback = new StringFeedback(() => LayoutName);
             LayoutFeedback = new IntFeedback("LayoutFeedback", () => (int) _401C.HdWpWindowLayout.LayoutFeedback);
             NameFeedback = new StringFeedback("ImagePathFeedback", () => Name);
@@ -76,7 +77,17 @@ namespace epi.videoProcessor.crestron.wp401
             LayoutNamesFeedback.LinkInputSig(trilist.StringInput[joinMap.LayoutNames.JoinNumber]);
 
             trilist.SetUShortSigAction(joinMap.SelectLayout.JoinNumber,
-                (a) => _401C.HdWpWindowLayout.Layout = (WindowLayout.eLayoutType) a);
+                (a) =>
+                {
+                    if (DisableAutoMode)
+                    {
+                        if(a > 0)
+                            _401C.HdWpWindowLayout.Layout = (WindowLayout.eLayoutType)a;
+                    }
+                        
+                    else
+                        _401C.HdWpWindowLayout.Layout = (WindowLayout.eLayoutType)a;
+                });
 
             //trilist.SetUShortSigAction(joinMap.SelectBackground.JoinNumber, (a) => SetBackGround(a));
 
